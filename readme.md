@@ -100,14 +100,9 @@ Right now, only Azure and AWS is supported, but this can be extended using the `
 
 |API Endpoint | Method Type     | Parameters Accepted       |  Intented For |
 |:-------------:|:-------------:|:--------------------:     |:---------------:|
-|/upload-public|    POST    | 1.provider (`az, aws`)          | Anonymous User
-|               |           | 2. file (file to be uploaded)|
-|               |           | 3. Keys (as per `provider`, see `Supported Cloud providers table `)|
-|               |           | 4. bucket_name                |               
+|/upload-public|    POST    | 1.provider (`az, aws`)  <br> 2. file (file to be uploaded) <br>  3. Keys (as per `provider`, see `Supported Cloud providers table `) <br>    4. bucket_name     | Anonymous User              
 |/view-public   |   POST    | Same as above                 | Anonymous User
-|/delete        |   POST    |1. provider (`az, aws`)          | Registered User 
-|               |           |2. token (`header x-access-token`)|
-|               |           |3. filename                    |
+|/delete        |   POST    |1. provider (`az, aws`)  <br>  2. token (`header x-access-token`) <br>   3. filename     | Registered User 
 |/all           |   POST    | 1.provider (`az, aws`) <br> 2. token (`header x-access-token`) <br>| Registered
 |/download      |   POST    |  1.provider (`az, aws`) <br> 2. token (`header x-access-token`) <br> 3. filename| Registered User
 |/upload        |   POST    |  1.provider (`az, aws`) <br> 2. token (`header x-access-token`) <br> 3. file | Registered User
