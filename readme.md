@@ -27,6 +27,7 @@ $ docker ps
 ```
 
 ### `Create a User for MongoDB Database`
+![MongoDB](https://img.shields.io/badge/MongoDB-%234ea94b.svg?style=for-the-badge&logo=mongodb&logoColor=white)
 
 To do this, you will need the root username and password that you set in the docker-compose.yml file environment variables `MONGO_INITDB_ROOT_USERNAME` and `MONGO_INITDB_ROOT_PASSWORD` for the mongodb service.
 It’s better to avoid using the root administrative account when interacting with the database.
@@ -71,6 +72,7 @@ root:/# exit
 ```
 
 ## Test Application on `POSTMAN`
+![Postman](https://img.shields.io/badge/Postman-FF6C37?style=for-the-badge&logo=postman&logoColor=white)
 
 To test the restAPI endpoints\
 use [home](http://127.0.0.1/). 
@@ -81,6 +83,7 @@ http://127.0.0.1/           # home url
 
 
 ## Supported Cloud Providers
+![Azure](https://img.shields.io/badge/azure-%230072C6.svg?style=for-the-badge&logo=microsoftazure&logoColor=white) ![AWS](https://img.shields.io/badge/AWS-%23FF9900.svg?style=for-the-badge&logo=amazon-aws&logoColor=white)
 
 Right now, only Azure and AWS is supported, but this can be extended using the `StorageAction` Class.
 
