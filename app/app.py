@@ -286,7 +286,7 @@ def add_cloud_cred(current_user):
         )
     if cloud_provider == CloudProviderType.AZ.value:
         connection_string = form.get('connection_string')
-        container_name = form.get('container_name')
+        container_name = form.get('bucket_name')
         if not (connection_string or container_name):
             return make_response(
                 'Required parameter missing!',
