@@ -106,7 +106,7 @@ Right now, only Azure and AWS is supported, but this can be extended using the `
 |/all           |   POST    | 1.provider (`az, aws`) <br> 2. token (`header x-access-token`) <br>| Registered
 |/download      |   POST    |  1.provider (`az, aws`) <br> 2. token (`header x-access-token`) <br> 3. filename| Registered User
 |/upload        |   POST    |  1.provider (`az, aws`) <br> 2. token (`header x-access-token`) <br> 3. file | Registered User
-|/add           |   POST    |1.cloud_provider (`az, aws`) <br> 2. token (`header x-access-token`) <br> 3.Keys (as per `provider`, see `Supported Cloud providers table `)| Resigtered User
+|/add           |   POST    |1.provider (`az, aws`) <br> 2. token (`header x-access-token`) <br> 3.Keys (as per `provider`, see `Supported Cloud providers table `)| Resigtered User
 |/login         |   POST    | 1.email <br> 2. password  |   Registered User can login
 |/signup        |   POST    | 1. email <br> 2. password <br> 3. provider (`az, aws`) <br> 4. name| Any user can signup
 |/              |   GET     |                           |   Any User can visit the home page
