@@ -298,6 +298,8 @@ class AWSStorageServiceProvider(StorageAction):
         return self.return_parsed_blob_list(self.clt.list_objects_v2(Bucket=self.bucket_name, Delimiter=','))
 
     def delete_blob(self, name: str) -> bool:
+        if not (name in [item.get('filename') for item in self.list_blob()]):
+            return False
         try:
             self.clt.delete_object(Bucket=self.bucket_name, Key=name)
         except ClientError as e:

@@ -16,7 +16,6 @@ def az(user_cloud: Dict[str,Any]) -> StorageAction:
 
 
 def aws(user_cloud: Dict[str,Any]) -> StorageAction:
-    print(user_cloud)
     access_key_id = user_cloud.get('access_key')
     secret_access_key = user_cloud.get('secret_access_key')
     bucket_name = user_cloud.get('bucket_name')

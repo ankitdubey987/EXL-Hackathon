@@ -108,21 +108,15 @@ def get_public_data_url():
 def delete_blob(current_user):
     if not request.method == 'POST':
         abort(405)
-    provider: str = request.form['provider']
-    cloud_providers_list =list(users.find(
-        filter={'public_id':current_user.get('public_id')}
-        ))
-    if not cloud_providers_list:
+    cloud_providers_list = users.find_one(filter={'public_id':current_user.get('public_id')})
+    if not cloud_providers_list.get('cloud_provider'):
         return make_response(
-            'Cloud providers not present for the user!',
-            404
+            jsonify(
+                status=417,
+                message=f"User: {cloud_providers_list.get('name')}, Cloud provider is not registered! please register first. ",
+                data=None
+            ), 417
         )
-    if not (provider in [user_cloud.get('cloud_provider') for user_cloud in cloud_providers_list]):
-        return make_response(
-            'Cloud providers not present for the user!',
-            404
-        )
-    cloud_providers_list = users.find_one(filter={'public_id':current_user.get('public_id'), 'cloud_provider': provider})
     filename: str = request.form['filename']
     try:
         storage_provider = get_storage_provider(
@@ -136,7 +130,7 @@ def delete_blob(current_user):
         ))
     ret = service_provider.provider.delete_blob(filename)
     if not ret:
-        return make_response(jsonify(status=400, message='Encountered Error while deleting the object!', data=None), 400)
+        return make_response(jsonify(status=400, message='Error while deleting the object! Maybe, file is missing or something went wrong.', data=None), 400)
     return make_response(jsonify(status=200, message='Success', data=ret), 200)
 
 
@@ -145,22 +139,15 @@ def delete_blob(current_user):
 def list_blobs(current_user):
     if not request.method == 'POST':
         abort(405)
-    provider: str = request.form['provider']
-    cloud_providers_list =list(users.find(
-        filter={'public_id':current_user.get('public_id')}
-        ))
-    if not cloud_providers_list:
+    cloud_providers_list = users.find_one(filter={'public_id':current_user.get('public_id')})
+    if not cloud_providers_list.get('cloud_provider'):
         return make_response(
-            'Cloud providers not present for the user!',
-            404
+            jsonify(
+                status=417,
+                message=f"User: {cloud_providers_list.get('name')}, Cloud provider is not registered! please register first. ",
+                data=None
+            ), 417
         )
-    if not (provider in [user_cloud.get('cloud_provider') for user_cloud in cloud_providers_list]):
-        return make_response(
-            'Cloud providers not present for the user!',
-            404
-        )
-    cloud_providers_list = users.find_one(filter={'public_id':current_user.get('public_id'), 'cloud_provider': provider})
-    
     try:
         storage_provider = get_storage_provider(
             cloud_providers_list.get('cloud_provider'),
@@ -186,23 +173,16 @@ def list_blobs(current_user):
 def download_data(current_user):
     if not request.method == 'POST':
         abort(405)
-    provider: str = request.form['provider']
     filename: str = request.form['filename']
-    cloud_providers_list =list(users.find(
-        filter={'public_id':current_user.get('public_id')}
-        ))
-    if not cloud_providers_list:
-        return jsonify(make_response(
-            'Cloud providers not present for the user!',
-            404
-        ))
-    if not (provider in [user_cloud.get('cloud_provider') for user_cloud in cloud_providers_list]):
-        return jsonify(make_response(
-            'Cloud providers not present for the user!',
-            404
-        ))
-    cloud_providers_list = users.find_one(filter={'public_id':current_user.get('public_id'), 'cloud_provider': provider})
-    
+    cloud_providers_list = users.find_one(filter={'public_id':current_user.get('public_id')})
+    if not cloud_providers_list.get('cloud_provider'):
+        return make_response(
+            jsonify(
+                status=417,
+                message=f"User: {cloud_providers_list.get('name')}, Cloud provider is not registered! please register first. ",
+                data=None
+            ), 417
+        )
     try:
         storage_provider = get_storage_provider(
             cloud_providers_list.get('cloud_provider'),
@@ -229,21 +209,15 @@ def upload_data(current_user):
     if not request.method == 'POST':
         abort(405)
     data: Any = request.files.get('file')
-    provider: str = request.form['provider']
-    cloud_providers_list =list(users.find(
-        filter={'public_id':current_user.get('public_id')}
-        ))
-    if not cloud_providers_list:
+    cloud_providers_list = users.find_one(filter={'public_id':current_user.get('public_id')})
+    if not cloud_providers_list.get('cloud_provider'):
         return make_response(
-            'Cloud providers not present for the user!',
-            404
+            jsonify(
+                status=417,
+                message=f"User: {cloud_providers_list.get('name')}, Cloud provider is not registered! please register first. ",
+                data=None
+            ), 417
         )
-    if not (provider in [user_cloud.get('cloud_provider') for user_cloud in cloud_providers_list]):
-        return make_response(
-            'Cloud provider is not present for the user!',
-            404
-        )
-    cloud_providers_list = users.find_one(filter={'public_id':current_user.get('public_id'), 'cloud_provider': provider})
     try:
         storage_provider = get_storage_provider(
             cloud_providers_list.get('cloud_provider'),
@@ -267,7 +241,15 @@ def add_cloud_cred(current_user):
     if not cloud_provider or not form:
         return make_response(
             'Required parameter missing!',
-            409
+            400
+        )
+    if not (cloud_provider==current_user.get('cloud_provider')):
+        return make_response(
+            jsonify(
+                status=409,
+                message="Cloud provider entered does not match the one which you used while login!, Please check and update.",
+                data=None
+            ), 409
         )
     try:
         if cloud_provider == CloudProviderType.AWS.value:
@@ -277,7 +259,7 @@ def add_cloud_cred(current_user):
             if not (access_key_id or secret_access_key or bucket_name):
                 return make_response(
                     'Required parameter missing!',
-                    409
+                    400
                 )
             
             user_cloud_info = set_aws_cloud_details(
@@ -293,7 +275,7 @@ def add_cloud_cred(current_user):
             if not (connection_string or container_name):
                 return make_response(
                     'Required parameter missing!',
-                    409
+                    400
                 )
             user_cloud_info = set_azure_cloud_details(
                 public_id=current_user.get('public_id'),
@@ -305,7 +287,7 @@ def add_cloud_cred(current_user):
         return make_response(
             jsonify(
                 status=406,
-                message="Something went wrong, please check the payload parameters!",
+                message="Something went wrong, please check the payload parameters as per cloud provider!",
                 data=None
             ),
             406
