@@ -240,7 +240,7 @@ def upload_data(current_user):
         )
     if not (provider in [user_cloud.get('cloud_provider') for user_cloud in cloud_providers_list]):
         return make_response(
-            'Cloud providers not present for the user!',
+            'Cloud provider is not present for the user!',
             404
         )
     cloud_providers_list = users.find_one(filter={'public_id':current_user.get('public_id'), 'cloud_provider': provider})
@@ -263,60 +263,81 @@ def upload_data(current_user):
 @token_required
 def add_cloud_cred(current_user):
     form = request.form
-    cloud_provider = form.get('cloud_provider')
-    if not cloud_provider:
+    cloud_provider = form.get('provider')
+    if not cloud_provider or not form:
         return make_response(
             'Required parameter missing!',
             409
         )
-    if cloud_provider == CloudProviderType.AWS.value:
-        access_key_id = form.get('access_key')
-        secret_access_key = form.get('secret_access_key')
-        bucket_name = form.get('bucket_name')
-        if not (access_key_id or secret_access_key or bucket_name):
-            return make_response(
-                'Required parameter missing!',
-                409
+    try:
+        if cloud_provider == CloudProviderType.AWS.value:
+            access_key_id = form.get('access_key')
+            secret_access_key = form.get('secret_access_key')
+            bucket_name = form.get('bucket_name')
+            if not (access_key_id or secret_access_key or bucket_name):
+                return make_response(
+                    'Required parameter missing!',
+                    409
+                )
+            
+            user_cloud_info = set_aws_cloud_details(
+                public_id=current_user.get('public_id'),
+                access_key_id=access_key_id,
+                secret_access_key=secret_access_key,
+                bucket_name=bucket_name
             )
-        user_cloud_info = set_aws_cloud_details(
-            public_id=current_user.get('public_id'),
-            access_key_id=access_key_id,
-            secret_access_key=secret_access_key,
-            bucket_name=bucket_name
-        )
-    if cloud_provider == CloudProviderType.AZ.value:
-        connection_string = form.get('connection_string')
-        container_name = form.get('bucket_name')
-        if not (connection_string or container_name):
-            return make_response(
-                'Required parameter missing!',
-                409
+        
+        if cloud_provider == CloudProviderType.AZ.value:
+            connection_string = form.get('connection_string')
+            container_name = form.get('bucket_name')
+            if not (connection_string or container_name):
+                return make_response(
+                    'Required parameter missing!',
+                    409
+                )
+            user_cloud_info = set_azure_cloud_details(
+                public_id=current_user.get('public_id'),
+                az_connection_string=connection_string,
+                bucket_name=container_name
             )
-        user_cloud_info = set_azure_cloud_details(
-            public_id=current_user.get('public_id'),
-            az_connection_string=connection_string,
-            bucket_name=container_name
+    except Exception as e:
+        logging.error(e)
+        return make_response(
+            jsonify(
+                status=406,
+                message="Something went wrong, please check the payload parameters!",
+                data=None
+            ),
+            406
         )
     if not user_cloud_info:
-        return make_response('Something went wrong try again!', 304)
-    return make_response('Successfully, Cloud Info registered.', 201)
+        return make_response(
+            jsonify(
+                status=304,
+                message="Something went wrong!",
+                data=None
+            ),
+            304
+        )
+    return make_response(jsonify(status=201, message='Successfully, Cloud Info registered.', data=user_cloud_info), 201)
 
 
 @app.route('/login', methods=['POST'])
 def login():
     auth = request.form
-    if not auth or not auth.get('email') or not auth.get('password'):
+    if not auth or not auth.get('email') or not auth.get('password') or not auth.get('provider'):
         return make_response(
-            'Could not verify',
+            'Could not verify! Due to missing/incorrect required parameters.',
             401,
             {'WWW-Authenticate': 'Basic realm ="Login Required!"'}
         )
     user = users.find_one({
-        "email": auth.get('email')
+        "email": auth.get('email'),
+        "cloud_provider": auth.get('provider')
     })
     if not user:
         return make_response(
-            'Could not verify',
+            "Could not verify, maybe user doesn't exist with the cloud provider!",
             401,
             {'WWW-Authenticate': 'Basic realm ="Login Required!"'}
         )
@@ -332,7 +353,7 @@ def login():
             ), 201
         )
     return make_response(
-        'Could not Verify',
+        'Could not Verify, may be due to wrong username, password or cloud provider!',
         403,
         {'WWW-Authenticate': 'Basic realm ="Wrong Password !!"'}
     )
@@ -347,7 +368,7 @@ def signup():
     password = data.get('password')
     provider = data.get('provider')
     # checking for existing user
-    ext_user = users.find_one({"email": email})
+    ext_user = users.find_one({"email": email, "cloud_provider": provider})
     if not ext_user:
         # database ORM object
         new_user = create_user(
@@ -360,7 +381,7 @@ def signup():
         return make_response(f'UserId:{new_user} Successfully registered.', 201)
     else:
         # returns 202 if user already exists
-        return make_response('User already exists. Please Log in.', 202)
+        return make_response('User already exists with that cloud provider! Please Log in.', 202)
 
 
 @app.route('/', methods=['GET'])
