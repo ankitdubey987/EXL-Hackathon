@@ -1,0 +1,313 @@
+{
+	"info": {
+		"_postman_id": "ea87174b-13b2-44fc-beb0-50917ebce8d0",
+		"name": "EXL Hackathon 2022",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "{{url}}view-public",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "x-access-token",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "filename",
+							"value": "e02a3d69-865b-4b52-87b0-9ec20387fb84.log",
+							"type": "text"
+						},
+						{
+							"key": "provider",
+							"value": "aws",
+							"type": "text"
+						},
+						{
+							"key": "access_key",
+							"value": "{{access_key}}",
+							"type": "text"
+						},
+						{
+							"key": "bucket_name",
+							"value": "exlhack",
+							"type": "text"
+						},
+						{
+							"key": "secret_access_key",
+							"value": "{{secret_access_key}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{url}}view-public",
+					"host": [
+						"{{url}}view-public"
+					]
+				},
+				"description": "Returns the URL for the blob item, this URL expires after some time."
+			},
+			"response": []
+		},
+		{
+			"name": "{{url}}delete",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "x-access-token",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "filename",
+							"value": "dde3f795-4854-4ecd-9efa-f3eb8309ea01.log",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{url}}delete",
+					"host": [
+						"{{url}}delete"
+					]
+				},
+				"description": "This API deletes the blob item from storage."
+			},
+			"response": []
+		},
+		{
+			"name": "{{url}}download",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "x-access-token",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "filename",
+							"value": "dde3f795-4854-4ecd-9efa-f3eb8309ea01.log",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{url}}download",
+					"host": [
+						"{{url}}download"
+					]
+				},
+				"description": "Download the blob data in string format, which can used by applications to create file on client side."
+			},
+			"response": []
+		},
+		{
+			"name": "{{url}}all",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "x-access-token",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{url}}all",
+					"host": [
+						"{{url}}all"
+					]
+				},
+				"description": "Returns a list of all the items present in blob storage."
+			},
+			"response": []
+		},
+		{
+			"name": "{{url}}upload",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "x-access-token",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "file",
+							"type": "file",
+							"src": "/C:/Users/ankit/Documents/SynKernelDiag2021-08-20_02-48-35.log"
+						},
+						{
+							"key": "bucket_name",
+							"value": "",
+							"type": "text",
+							"disabled": true
+						}
+					]
+				},
+				"url": {
+					"raw": "{{url}}upload",
+					"host": [
+						"{{url}}upload"
+					]
+				},
+				"description": "Uploads file to blob storage."
+			},
+			"response": []
+		},
+		{
+			"name": "{{url}}add",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "x-access-token",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "access_key",
+							"value": "{{access_key}}",
+							"type": "text"
+						},
+						{
+							"key": "secret_access_key",
+							"value": "{{secret_access_key}}",
+							"type": "text"
+						},
+						{
+							"key": "bucket_name",
+							"value": "exlhack",
+							"type": "text"
+						},
+						{
+							"key": "provider",
+							"value": "az",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{url}}add",
+					"host": [
+						"{{url}}add"
+					]
+				},
+				"description": "Helps the user to add his/her cloud provider credentials to the mongo storage of this restAPI server. Which can be used later by the user to communicate with his/her cloud provider."
+			},
+			"response": []
+		},
+		{
+			"name": "{{url}}login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);\r",
+							"postman.setEnvironmentVariable(\"token\", jsonData.token);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "email",
+							"value": "admin@gmail.com",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "admin",
+							"type": "text"
+						},
+						{
+							"key": "provider",
+							"value": "aws",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{url}}login",
+					"host": [
+						"{{url}}login"
+					]
+				},
+				"description": "Registered user can use this API endpoint to login to this restAPI application. Later the token can be used in header (x-access-token), to access other API Endpoints."
+			},
+			"response": []
+		},
+		{
+			"name": "{{url}}signup",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "name",
+							"value": "ankit dubey",
+							"type": "text"
+						},
+						{
+							"key": "email",
+							"value": "admin@gmail.com",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "admin",
+							"type": "text"
+						},
+						{
+							"key": "provider",
+							"value": "aws",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{url}}signup",
+					"host": [
+						"{{url}}signup"
+					]
+				},
+				"description": "restAPI to sign up users for this application."
+			},
+			"response": []
+		}
+	]
+}
